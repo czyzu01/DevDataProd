@@ -1,0 +1,63 @@
+---
+title       : Quality Control and quality
+subtitle    : Developing Data Products slide
+author      : Maciej Czyżowicz
+job         :
+framework   : io2012 # {102012, html5slides, Shower, dzslides, . . .  
+highlighter : highlight.js # {highlight.js, prettify, highlight} 
+hitheme     : tomorrow # 
+widgets     : [] # {mathjax, quiz, bootstrap}
+mode        : selfcontained #I {Standalone, draft}
+
+---
+
+## Quality Control and quality assurance
+ 1. Very important in multiple (if not all) industries
+ 2. For most, this means that one or more people are meticulously inspecting what's coming out
+ 3. Looking for imperfections and validating that requirements for products and services produced are satisfied. 
+ 
+## Enter statistical quality control
+
+ 1. Statistical process control (SPC) is a method of quality control which uses statistical methods. (http://en.wikipedia.org/wiki/Statistical_process_control)
+ 2. Especially a Shewhart individuals control chart
+
+---
+
+## Basic tools for working with qcc
+ 
+```{r echo=TRUE}
+library(qcc) # for creating qcc plots
+library(xts) # for creating and working with time series
+library(lubridate) # for parsing strings to dates
+```
+
+---
+
+## QCC Shiny app
+
+* App was created to be a demo of QCC abilities in R.
+* It contains predefined set of observation spanning two years
+* It displays a quality check and control plot
+* Range of dates can be used to manipulate the chart
+* Each time the date change (being range for base (reference) data or for new data) plot will update
+
+## Apps avaliable at:
+# http://czyzu.shinyapps.io/DevDataProd_Project
+
+---
+
+## Sample plot
+
+```{r echo=FALSE}
+observations<-read.csv('dol_1.csv', sep="\t")
+rownames(observations) = observations[,1]
+observations<-observations[, "COUNT", drop=FALSE]
+observations.ts<-as.xts(observations)
+dane_bazowe<-window(observations.ts, end=parse_date_time("2014-07-01", "%y-%m-%d"))
+dane_testowe<-window(observations.ts, start=parse_date_time("2014-07-01", "%y-%m-%d"))
+```
+```{r  fig.align='center'}
+qcc (data=dane_bazowe, newdata=dane_testowe, 
+     type="xbar.one", title="Number of observations", xlab="day")
+```
+
