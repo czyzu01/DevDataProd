@@ -1,13 +1,13 @@
 doladowania<-read.csv("dol_1.csv", sep="\t")
 rownames(doladowania) = doladowania[,1]
-doladowania<-doladowania[, "ILE_NUMEROW", drop=FALSE]
+doladowania<-doladowania[, "COUNT", drop=FALSE]
 
 library(xts)
 doladowania.ts<-as.xts(doladowania)
 
 
 ?xts
-temp<-as.date(doladowania[,"DZIEN"])
+temp<-as.date(doladowania[,"DAY"])
 library(lubridate)
 
 plot(doladowania.ts)
@@ -35,11 +35,6 @@ plot(window(doladowania.ts, end=parse_date_time("2014-07-01", "%y-%m-%d")))
 dane_bazowe<-window(doladowania.ts, end=parse_date_time("2014-07-01", "%y-%m-%d"))
 dane_testowe<-window(doladowania.ts, start=parse_date_time("2014-07-01", "%y-%m-%d"))
 
-qcc (data=dane_bazowe, 
-     newdata=dane_testowe,
-         type="xbar.one", add.stats=TRUE, title="Ilość numerów doładowujących", xlab="dzien")
-
-fit<-lm(doladowania$ILE_NUMEROW~doladowania$DZIEN)
+qcc_results<-qcc (data=dane_bazowe, newdata=dane_testowe, type="xbar.one", title="Number of observations", xlab="day")
 
 
-plot (fit)

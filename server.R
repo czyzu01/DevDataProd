@@ -1,22 +1,38 @@
 library(shiny)
-library(UsingR)
+#library(UsingR)
+library(xts)
 library(astsa)
+library(qcc)
+library(lubridate)
+library(xts)
 
-data(galton)
+observations<-read.csv("dol_1.csv", sep="\t")
+rownames(observations) = observations[,1]
+observations<-observations[, "COUNT", drop=FALSE]
+
+observations.ts<-as.xts(observations)
+
+#data(galton)
 
 shinyServer(
-    
+
     function(input, output) {
-#         output$oid1 <- renderPrint({input$id1})
-#         output$oid2 <- renderPrint({input$id2})
-#         output$odate <- renderPrint({input$date})
-        output$newHist <- renderPlot({
-            hist(galton$child, xlab='child height', col='lightblue',main='Histogram')
-            mu <- input$mu
-            lines(c(mu, mu), c(0, 200),col="red",lwd=5)
-            mse <- mean((galton$child - mu)^2)
-            text(63, 150, paste("mu = ", mu))
-            text(63, 140, paste("MSE = ", round(mse, 2)))
-        })        
+        
+        output$start_date_df <- renderPrint({input$start_date})
+        output$cut_date_df <- renderPrint({input$cut_off_point})
+        output$end_date_df <- renderPrint({input$finish_date})
+
+        base_data<- reactive({
+            window(observations.ts, 
+                   start=parse_date_time(input$start_date, "%y-%m-%d"),
+                   end=parse_date_time(input$cut_off_point, "%y-%m-%d"))
+        })
+        new_data <- reactive({
+                window(observations.ts, 
+                    start=parse_date_time(input$cut_off_point, "%y-%m-%d"),
+                    end=parse_date_time(input$finish_date, "%y-%m-%d"))
+        })
+        output$newQcc <- renderPlot({qcc (data=base_data(), newdata=new_data(), type="xbar.one", title="Number of observations", xlab="day")})        
+
     }
 )

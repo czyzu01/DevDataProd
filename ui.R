@@ -21,11 +21,20 @@ shinyUI(pageWithSidebar(
 #         verbatimTextOutput("odate")
 #     )
     
-    headerPanel("Example plot"),
+    headerPanel("QCC"),
     sidebarPanel(
-        sliderInput('mu', 'Guess at the mean',value = 70, min = 62, max = 74, step = 0.05,)
+        dateInput("start_date", "Start date:", value="2012-07-01"),
+        dateInput("cut_off_point", "Cut off point:", value="2014-07-01"),
+        dateInput("finish_date", "Finish date:", value="2014-08-05")
     ),
     mainPanel(
-        plotOutput('newHist')
+        h1('New QCC information'),
+        p("Start of dataset:"),
+        verbatimTextOutput("start_date_df"),
+        p("Cutting point"),
+        verbatimTextOutput("cut_date_df"),
+        p("End of dataset"),
+        verbatimTextOutput("end_date_df"),
+        plotOutput('newQcc')
     )    
 ))
